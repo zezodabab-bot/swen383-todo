@@ -4,8 +4,13 @@ import { LocalStorageHandler } from './LocalStorageHandler.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   const storage = new LocalStorageHandler();
+
   const service = new TodoService(storage);
-  const renderer = new TodoRenderer(service, 'task-container');
+
+  const renderer = new TodoRenderer(
+    'task-container',
+    service
+  );
 
   renderer.render();
 
@@ -14,24 +19,20 @@ window.addEventListener('DOMContentLoaded', () => {
   const addUrgentBtn = document.getElementById('add-urgent-btn');
 
   addBtn.addEventListener('click', () => {
-    const task = service.addTask(input.value, 'simple');
-
-    if (task) {
+    if (service.addTask(input.value, 'simple')) {
       input.value = '';
-      renderer.render(task.id);
+      renderer.render();
     }
   });
 
   addUrgentBtn.addEventListener('click', () => {
-    const task = service.addTask(input.value, 'urgent');
-
-    if (task) {
+    if (service.addTask(input.value, 'urgent')) {
       input.value = '';
-      renderer.render(task.id);
+      renderer.render();
     }
   });
 
-  input.addEventListener('keydown', event => {
+  input.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       addBtn.click();
     }

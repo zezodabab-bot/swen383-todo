@@ -1,7 +1,16 @@
 export class TodoService {
   constructor(storage) {
+    this.tasks = [];
     this.storage = storage;
+    this.loadTasks();
+  }
+
+  loadTasks() {
     this.tasks = this.storage.load();
+  }
+
+  saveTasks() {
+    this.storage.save(this.tasks);
   }
 
   addTask(description, type) {
@@ -13,7 +22,9 @@ export class TodoService {
     }
 
     if (this.tasks.length >= 20) {
-      console.warn('This list is getting long - consider clearing completed tasks.');
+      console.warn(
+        'This list is getting long - consider clearing completed tasks.'
+      );
     }
 
     const task = {
@@ -30,33 +41,22 @@ export class TodoService {
     }
 
     this.tasks.push(task);
-    this.storage.save(this.tasks);
+    this.saveTasks();
 
-    return task;
+    return true;
   }
 
   toggleComplete(id) {
     const task = this.tasks.find(t => t.id === id);
 
-    if (!task) return false;
+    if (!task) return;
 
     task.completed = !task.completed;
-    this.storage.save(this.tasks);
-
-    return true;
+    this.saveTasks();
   }
 
   deleteTask(id) {
-    const originalLength = this.tasks.length;
-
     this.tasks = this.tasks.filter(t => t.id !== id);
-
-    if (this.tasks.length === originalLength) {
-      return false;
-    }
-
-    this.storage.save(this.tasks);
-
-    return true;
+    this.saveTasks();
   }
 }
