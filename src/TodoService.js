@@ -42,5 +42,33 @@ export class TodoService {
     return task.id;
   }
 
-  // Keep toggleTask and deleteTask as they were...
+  toggleComplete(id) {
+    const task = this.tasks.find(t => t.id === id);
+    if (!task) return;
+    task.completed = !task.completed;
+    this.storage.save(this.tasks);
+  }
+
+  deleteTask(id) {
+    this.tasks = this.tasks.filter(t => t.id !== id);
+    this.storage.save(this.tasks);
+  }
+
+  getWorkloadSummary() {
+    let done = 0;
+    let urgent = 0;
+    let normal = 0;
+
+    for (const task of this.tasks) {
+      if (task.completed) {
+        done++;
+      } else if (task.priority === 'high') {
+        urgent++;
+      } else {
+        normal++;
+      }
+    }
+
+    return `${done}/${this.tasks.length} done - ${urgent} urgent, ${normal} normal remaining`;
+  }
 }

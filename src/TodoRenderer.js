@@ -2,6 +2,11 @@
 export class TodoRenderer {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
+    this.actions = { onToggle() {}, onDelete() {} };
+  }
+
+  bindActions(actions) {
+    this.actions = actions;
   }
 
   renderPendingRows(service) {
@@ -45,18 +50,12 @@ export class TodoRenderer {
 
     const toggleButtons = this.container.querySelectorAll('[data-toggle]');
     for (const btn of toggleButtons) {
-      btn.addEventListener('click', () => {
-        service.toggleComplete(Number(btn.dataset.toggle));
-        this.render(service);
-      });
+      btn.addEventListener('click', () => this.actions.onToggle(Number(btn.dataset.toggle)));
     }
 
     const deleteButtons = this.container.querySelectorAll('[data-delete]');
     for (const btn of deleteButtons) {
-      btn.addEventListener('click', () => {
-        service.deleteTask(Number(btn.dataset.delete));
-        this.render(service);
-      });
+      btn.addEventListener('click', () => this.actions.onDelete(Number(btn.dataset.delete)));
     }
 
     if (justAddedId) {
@@ -72,5 +71,19 @@ export class TodoRenderer {
 }
 
 function buildTaskRow(id, desc, completed, priority, createdAt, showActions) {
-  // Keep the exact body from your original Week 1/2 todo.js file
+  const label = desc.length > 40 ? `${desc.slice(0, 40)}...` : desc;
+  const priorityClass = priority === 'high' ? 'priority-high' : '';
+  const completedClass = completed ? 'completed' : '';
+  const actions = showActions
+    ? `<span class="task-actions">
+        <button data-toggle="${id}">${completed ? 'Undo' : 'Done'}</button>
+        <button data-delete="${id}">Delete</button>
+      </span>`
+    : '';
+
+  return `<li class="${completedClass}" data-row="${id}">
+      <span class="task-desc ${priorityClass}">${label}</span>
+      <span class="task-time">${createdAt}</span>
+      ${actions}
+    </li>`;
 }
